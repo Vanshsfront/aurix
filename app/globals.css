@@ -1,26 +1,146 @@
 @import "tailwindcss";
 
+/* ------------------------------------------------------------------ *
+ *  AURIX — design tokens
+ *  Dark & gold minimal. Near-black canvas, gold foil, quiet type.
+ * ------------------------------------------------------------------ */
+@theme {
+  /* Core palette */
+  --color-ink: #0b0b0d; /* near-black canvas */
+  --color-ink-2: #111015; /* raised charcoal */
+  --color-ink-3: #17161c; /* cards / panels */
+  --color-line: #2a2730; /* hairline borders */
+
+  --color-gold: #c9a24b; /* primary gold */
+  --color-gold-light: #e6cd8e; /* highlight gold */
+  --color-gold-deep: #9a7b33; /* shadowed gold */
+
+  --color-ivory: #f3ede1; /* warm near-white text */
+  --color-cream: #e7dcc6; /* secondary cream */
+  --color-mute: #8d8678; /* muted warm grey */
+  --color-mute-2: #5d584f; /* dim labels */
+
+  /* Per-flavour accents */
+  --color-rasmalai: #c9a24b;
+  --color-gulab: #c16a82;
+  --color-chai: #b5703a;
+
+  /* Type */
+  --font-display: var(--font-cinzel); /* engraved roman caps */
+  --font-serif: var(--font-cormorant); /* editorial serif */
+  --font-sans: var(--font-jost); /* UI / body */
+
+  /* Motion */
+  --ease-lux: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Layout */
+  --spacing-gutter: clamp(1.25rem, 5vw, 6rem);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: var(--color-ink);
+  --foreground: var(--color-ivory);
+  --flavour: var(--color-gold); /* live per-flavour accent, set by JS */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html {
+  scroll-behavior: smooth;
+  background: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-ink);
+  color: var(--color-ivory);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+  overflow-x: hidden;
+}
+
+/* Selection + scrollbar — small premium details */
+::selection {
+  background: color-mix(in srgb, var(--color-gold) 35%, transparent);
+  color: var(--color-ivory);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-gold-deep) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-gold-deep);
+  border-radius: 999px;
+}
+
+/* ------------------------------------------------------------------ *
+ *  Utilities
+ * ------------------------------------------------------------------ */
+
+/* Engraved gold wordmark / headings */
+.text-gold-gradient {
+  background: linear-gradient(
+    180deg,
+    var(--color-gold-light) 0%,
+    var(--color-gold) 45%,
+    var(--color-gold-deep) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Hairline tracked label (the "RASMALAI / COCKTAIL" look) */
+.eyebrow {
+  font-family: var(--font-sans), sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.42em;
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--color-mute);
+}
+
+/* Thin gold divider */
+.rule-gold {
+  height: 1px;
+  width: 3.5rem;
+  background: linear-gradient(
+    90deg,
+    var(--color-gold),
+    transparent
+  );
+}
+
+/* Subtle grain/vignette layer for depth */
+.bg-vignette {
+  background:
+    radial-gradient(
+      120% 90% at 50% 0%,
+      color-mix(in srgb, var(--flavour) 8%, transparent) 0%,
+      transparent 55%
+    ),
+    var(--color-ink);
+}
+
+/* Reveal animation fallback when JS/motion not present */
+@keyframes aurix-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
