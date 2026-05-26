@@ -3,10 +3,11 @@ import { Cinzel, Cormorant_Garamond, Jost } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
+import { ConditionalFooter } from "@/components/layout/ConditionalFooter";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { CartPopup } from "@/components/cart/CartPopup";
 import { AgeGate } from "@/components/AgeGate";
+import { SmoothScroll } from "@/components/SmoothScroll";
 
 const cinzel = Cinzel({
   subsets: ["latin"],
@@ -73,10 +74,11 @@ export default function RootLayout({
     >
       <body className="bg-ink text-ivory min-h-full">
         <Providers>
+          <SmoothScroll />
           <AgeGate />
           <Navbar />
           <main>{children}</main>
-          <Footer />
+          <ConditionalFooter />
           <CartDrawer />
           <CartPopup />
         </Providers>

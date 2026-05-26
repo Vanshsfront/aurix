@@ -28,9 +28,9 @@ export function Footer() {
           </FooterCol>
 
           <FooterCol title="House">
-            <FooterLink href="/#story">Our story</FooterLink>
-            <FooterLink href="/#ritual">The ritual</FooterLink>
-            <FooterLink href="/#function">Functional standard</FooterLink>
+            <FooterLink href="/">The experience</FooterLink>
+            <FooterLink href="/shop">Our story</FooterLink>
+            <FooterLink href="/shop">The functional standard</FooterLink>
           </FooterCol>
 
           <FooterCol title="Connect">

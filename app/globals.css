@@ -2,33 +2,35 @@
 
 /* ------------------------------------------------------------------ *
  *  AURIX — design tokens
- *  Dark & gold minimal. Near-black canvas, gold foil, quiet type.
+ *  Rose-gold + black. Deep warm black canvas, rose-gold metal, gradients.
+ *  (Token names keep the `gold` prefix; values are rose-gold.)
  * ------------------------------------------------------------------ */
 @theme {
   /* Core palette */
-  --color-ink: #0b0b0d; /* near-black canvas */
-  --color-ink-2: #111015; /* raised charcoal */
-  --color-ink-3: #17161c; /* cards / panels */
-  --color-line: #2a2730; /* hairline borders */
+  --color-ink: #08070a; /* deep warm black */
+  --color-ink-2: #0f0b0e; /* raised */
+  --color-ink-3: #171115; /* cards / panels */
+  --color-line: #2c2530; /* hairline borders */
 
-  --color-gold: #c9a24b; /* primary gold */
-  --color-gold-light: #e6cd8e; /* highlight gold */
-  --color-gold-deep: #9a7b33; /* shadowed gold */
+  --color-gold: #d99a8b; /* primary rose-gold */
+  --color-gold-light: #f4cabb; /* champagne highlight */
+  --color-gold-deep: #a86a5b; /* copper-rose shadow */
+  --color-rose: #c97b86; /* pink-rose accent */
 
-  --color-ivory: #f3ede1; /* warm near-white text */
-  --color-cream: #e7dcc6; /* secondary cream */
-  --color-mute: #8d8678; /* muted warm grey */
-  --color-mute-2: #5d584f; /* dim labels */
+  --color-ivory: #f3eae6; /* warm rose-white text */
+  --color-cream: #e9d8d1; /* secondary */
+  --color-mute: #9c8c87; /* warm rose-grey */
+  --color-mute-2: #61544f; /* dim labels */
 
-  /* Per-flavour accents */
-  --color-rasmalai: #c9a24b;
-  --color-gulab: #c16a82;
-  --color-chai: #b5703a;
+  /* Per-flavour accents (rose-gold family) */
+  --color-rasmalai: #d99a8b;
+  --color-gulab: #c97b86;
+  --color-chai: #bd8a5e;
 
   /* Type */
-  --font-display: var(--font-cinzel); /* engraved roman caps */
-  --font-serif: var(--font-cormorant); /* editorial serif */
-  --font-sans: var(--font-jost); /* UI / body */
+  --font-display: var(--font-cinzel);
+  --font-serif: var(--font-cormorant);
+  --font-sans: var(--font-jost);
 
   /* Motion */
   --ease-lux: cubic-bezier(0.22, 1, 0.36, 1);
@@ -44,16 +46,21 @@
 }
 
 html {
-  scroll-behavior: smooth;
   background: var(--color-ink);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
+/* Lenis smooth scroll */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
 }
 
 body {
@@ -65,7 +72,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Selection + scrollbar — small premium details */
 ::selection {
   background: color-mix(in srgb, var(--color-gold) 35%, transparent);
   color: var(--color-ivory);
@@ -88,12 +94,13 @@ body {
  *  Utilities
  * ------------------------------------------------------------------ */
 
-/* Engraved gold wordmark / headings */
+/* Rose-gold gradient text (class name kept for compatibility) */
 .text-gold-gradient {
   background: linear-gradient(
-    180deg,
+    105deg,
     var(--color-gold-light) 0%,
-    var(--color-gold) 45%,
+    var(--color-gold) 42%,
+    var(--color-rose) 70%,
     var(--color-gold-deep) 100%
   );
   -webkit-background-clip: text;
@@ -101,7 +108,19 @@ body {
   color: transparent;
 }
 
-/* Hairline tracked label (the "RASMALAI / COCKTAIL" look) */
+/* Live-accent gradient text */
+.text-flavour-gradient {
+  background: linear-gradient(
+    105deg,
+    color-mix(in srgb, var(--flavour) 70%, white) 0%,
+    var(--flavour) 55%,
+    color-mix(in srgb, var(--flavour) 60%, black) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 .eyebrow {
   font-family: var(--font-sans), sans-serif;
   text-transform: uppercase;
@@ -111,29 +130,53 @@ body {
   color: var(--color-mute);
 }
 
-/* Thin gold divider */
 .rule-gold {
   height: 1px;
   width: 3.5rem;
-  background: linear-gradient(
-    90deg,
-    var(--color-gold),
-    transparent
-  );
+  background: linear-gradient(90deg, var(--color-gold), transparent);
 }
 
-/* Subtle grain/vignette layer for depth */
-.bg-vignette {
+/* Capsule pill */
+.capsule {
+  border-radius: 999px;
+}
+
+/* Ambient gradient field — rose-gold glow on warm black */
+.bg-aurora {
   background:
     radial-gradient(
-      120% 90% at 50% 0%,
-      color-mix(in srgb, var(--flavour) 8%, transparent) 0%,
+      60% 50% at 50% 18%,
+      color-mix(in srgb, var(--flavour) 16%, transparent) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      80% 60% at 80% 90%,
+      color-mix(in srgb, var(--color-rose) 10%, transparent) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      70% 60% at 10% 80%,
+      color-mix(in srgb, var(--color-gold-deep) 12%, transparent) 0%,
       transparent 55%
     ),
     var(--color-ink);
 }
 
-/* Reveal animation fallback when JS/motion not present */
+.bg-vignette {
+  background:
+    radial-gradient(
+      120% 90% at 50% 0%,
+      color-mix(in srgb, var(--flavour) 12%, transparent) 0%,
+      transparent 55%
+    ),
+    var(--color-ink);
+}
+
+/* Thin rose-gold hairline used for rings/dividers */
+.ring-rosegold {
+  border-color: color-mix(in srgb, var(--color-gold) 40%, transparent);
+}
+
 @keyframes aurix-fade-up {
   from {
     opacity: 0;
@@ -142,5 +185,11 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes aurix-spin {
+  to {
+    transform: rotate(360deg);
   }
 }

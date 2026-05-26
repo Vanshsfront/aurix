@@ -6,6 +6,7 @@ import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import { PRODUCTS } from "@/lib/products";
 import { useFlavour } from "@/context/FlavourProvider";
+import { scrollStore } from "@/lib/scrollStore";
 
 const ORDER = PRODUCTS.map((p) => p.slug);
 
@@ -16,14 +17,17 @@ const BODY_H = 2 * Math.PI * RADIUS * (995 / 1370); // ≈ 4.56 — a slim can
 const NECK_H = 0.24;
 const FADE_SECONDS = 0.7;
 
-const GOLD = "#b89248";
+const GOLD = "#c98a78"; // rose-gold metal
 
 export function Can({
   interactive = true,
   animate = true,
+  scrollFlavour = false,
 }: {
   interactive?: boolean;
   animate?: boolean;
+  /** When true, the active flavour is read from the scroll store, not context. */
+  scrollFlavour?: boolean;
 }) {
   const tex = useTexture({
     rasmalai: "/textures/labels/rasmalai.png",
@@ -117,9 +121,10 @@ export function Can({
   useFrame((state, delta) => {
     const d = Math.min(delta, 0.05);
 
-    // Continuous slow rotation + gentle bob.
+    // Continuous rotation (faster) + gentle bob; spin accelerates on hover.
     if (spinner.current && animate) {
-      spinner.current.rotation.y += d * 0.18;
+      const boost = scrollFlavour ? scrollStore.hover * 1.1 : 0;
+      spinner.current.rotation.y += d * (0.5 + boost);
       spinner.current.position.y = Math.sin(state.clock.elapsedTime * 0.7) * 0.07;
     }
 
@@ -143,7 +148,9 @@ export function Can({
     const shader = bodyMat.userData.shader as
       | { uniforms: { uMapB: { value: THREE.Texture }; uMix: { value: number } } }
       | undefined;
-    const target = ORDER.indexOf(active);
+    const target = scrollFlavour
+      ? ORDER.indexOf(scrollStore.flavour)
+      : ORDER.indexOf(active);
     if (shader && target >= 0 && target !== displayed.current) {
       shader.uniforms.uMapB.value = labelTextures[target];
       mix.current = Math.min(1, mix.current + d / FADE_SECONDS);

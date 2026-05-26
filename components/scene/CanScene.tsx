@@ -27,19 +27,19 @@ export default function CanScene({
 
       <ambientLight intensity={0.9} />
       {/* Key light, upper front */}
-      <directionalLight position={[4, 6, 6]} intensity={2.4} color="#fff4dc" />
+      <directionalLight position={[4, 6, 6]} intensity={2.4} color="#fff0e8" />
       {/* Front fill so the label reads clearly */}
-      <directionalLight position={[0, 1, 9]} intensity={1.6} color="#fff" />
-      {/* Warm gold rim from behind */}
+      <directionalLight position={[0, 1, 9]} intensity={1.5} color="#fff" />
+      {/* Rose-gold rim from behind */}
       <spotLight
         position={[-5, 3, -6]}
         angle={0.7}
         penumbra={1}
-        intensity={3}
-        color="#e6b864"
+        intensity={3.2}
+        color="#e6a48f"
       />
       {/* Cool fill to separate from the dark background */}
-      <pointLight position={[-4, -2, 4]} intensity={0.6} color="#9fb4d8" />
+      <pointLight position={[-4, -2, 4]} intensity={0.5} color="#a9b6d6" />
 
       <Suspense fallback={null}>
         <Can interactive={interactive} animate={animate} />
@@ -49,25 +49,25 @@ export default function CanScene({
             intensity={2}
             position={[0, 4, 2]}
             scale={[8, 3, 1]}
-            color="#fff6e2"
+            color="#fff0e8"
           />
           <Lightformer
             intensity={1.4}
             position={[4, 1, 3]}
             scale={[3, 6, 1]}
-            color="#f0d49a"
+            color="#f0c2b0"
           />
           <Lightformer
-            intensity={1.1}
+            intensity={1.2}
             position={[-5, 0, 2]}
             scale={[3, 6, 1]}
-            color="#cf9a52"
+            color="#d18f7e"
           />
           <Lightformer
             intensity={0.8}
             position={[0, -3, -3]}
             scale={[6, 4, 1]}
-            color="#5a4a2e"
+            color="#5a3a32"
           />
         </Environment>
       </Suspense>

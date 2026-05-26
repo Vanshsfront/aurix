@@ -3,14 +3,13 @@
 //
 //   node scripts/build-textures.mjs
 //
-// - Rasmalai: direct clean crop of the supplied artwork (gold botanical kept).
-// - Gulab / Masala Chai: composited from the same gold botanical motif + AURIX
-//   wordmark, with the flavour name rendered in that flavour's accent. This keeps
-//   the trio visually cohesive (shared black + gold system) while differentiating.
+// All three labels (incl. Rasmalai) are composited from ONE template so the
+// cans are visually identical in style: shared AURIX wordmark + gold botanical,
+// flavour name in that flavour's accent, and a fully-printed wrap (front block +
+// botanical + side/back text) so the rotating can never shows empty black.
 //
 // Output: public/textures/labels/{rasmalai,gulab,masala-chai}.png + can-top.png
-// All labels share one size (1370x995, ratio 1.377) so they wrap the cylinder
-// identically. Re-runnable; overwrites outputs.
+// All labels share one size (1370x995, ratio 1.377). Re-runnable; overwrites.
 
 import sharp from "sharp";
 import { mkdir } from "node:fs/promises";
@@ -23,23 +22,18 @@ const SRC = join(process.env.HOME, "Downloads", "Gemini Generated Image 2D Map.p
 const OUT = join(ROOT, "public", "textures");
 const LABELS = join(OUT, "labels");
 
-// Clean label rectangle inside all dieline guide lines (ratio ~1.377:1).
-const LABEL = { left: 270, top: 240, width: 1370, height: 995 };
-const W = LABEL.width;
-const H = LABEL.height;
+const W = 1370;
+const H = 995;
 const BG = "#1d1c1d"; // sampled label black
 
-// Gold botanical motif (no text), reused across the trio.
-const BOTANICAL = { left: 1255, top: 295, width: 330, height: 885 };
+// Gold botanical motif (no text) — widened for a fuller print.
+const BOTANICAL = { left: 1150, top: 295, width: 478, height: 885 };
+const BOT_LEFT = 700; // x position on the label
 
-const ACCENTS = {
-  gulab: "#c16a82",
-  "masala-chai": "#b5703a",
-};
-
-const GENERATED = {
-  gulab: { name: "GULAB", notes: ["ROSE", "GULKAND", "PISTACHIO"] },
-  "masala-chai": { name: "MASALA CHAI", notes: ["CARDAMOM", "CINNAMON", "CLOVE"] },
+const FLAVOURS = {
+  rasmalai: { name: "RASMALAI", notes: ["SAFFRON", "CARDAMOM", "ALMOND"], accent: "#d99a8b" },
+  gulab: { name: "GULAB", notes: ["ROSE", "GULKAND", "PISTACHIO"], accent: "#c97b86" },
+  "masala-chai": { name: "MASALA CHAI", notes: ["CARDAMOM", "CINNAMON", "CLOVE"], accent: "#bd8a5e" },
 };
 
 const SANS = "Avenir Next, Futura, Helvetica Neue, sans-serif";
@@ -50,44 +44,34 @@ function labelSvg(name, notes, accent) {
   return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
   <defs>
     <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#e6cd8e"/>
-      <stop offset="0.5" stop-color="#c9a24b"/>
-      <stop offset="1" stop-color="#9a7b33"/>
+      <stop offset="0" stop-color="#f0caa0"/>
+      <stop offset="0.5" stop-color="#cf9a6a"/>
+      <stop offset="1" stop-color="#9a6f48"/>
     </linearGradient>
   </defs>
-  <text x="${x}" y="170" font-family="${ROMAN}" font-size="86" letter-spacing="20"
-        fill="url(#gold)">AURIX</text>
 
-  <text x="${x + 4}" y="295" font-family="${SANS}" font-size="54" font-weight="400"
-        letter-spacing="12" fill="${accent}">${name}</text>
-  <text x="${x + 4}" y="350" font-family="${SANS}" font-size="34" font-weight="300"
-        letter-spacing="14" fill="#c9a24b">COCKTAIL</text>
+  <!-- Front block -->
+  <text x="${x}" y="170" font-family="${ROMAN}" font-size="86" letter-spacing="20" fill="url(#gold)">AURIX</text>
+  <text x="${x + 4}" y="295" font-family="${SANS}" font-size="54" font-weight="400" letter-spacing="12" fill="${accent}">${name}</text>
+  <text x="${x + 4}" y="350" font-family="${SANS}" font-size="34" font-weight="300" letter-spacing="14" fill="#cf9a6a">COCKTAIL</text>
+  <rect x="${x + 5}" y="392" width="120" height="1.5" fill="#9a6f48"/>
+  <text x="${x + 5}" y="455" font-family="${SANS}" font-size="30" font-weight="300" letter-spacing="8" fill="#e7dcc6">${notes[0]}</text>
+  <text x="${x + 5}" y="500" font-family="${SANS}" font-size="30" font-weight="300" letter-spacing="8" fill="#e7dcc6">${notes[1]}</text>
+  <text x="${x + 5}" y="545" font-family="${SANS}" font-size="30" font-weight="300" letter-spacing="8" fill="#e7dcc6">${notes[2]}</text>
+  <text x="${x + 5}" y="770" font-family="${SANS}" font-size="34" font-weight="300" letter-spacing="4" fill="#cf9a6a">110 ml</text>
+  <text x="${x + 5}" y="815" font-family="${SANS}" font-size="24" font-weight="300" letter-spacing="6" fill="#8d8678">ALC. 7% VOL.</text>
+  <text x="${x + 5}" y="915" font-family="${SANS}" font-size="22" font-weight="300" letter-spacing="14" fill="#8d8678">PREMIUM COCKTAIL</text>
 
-  <rect x="${x + 5}" y="392" width="120" height="1.5" fill="#9a7b33"/>
+  <!-- Left side: functional standard (vertical) -->
+  <text x="78" y="905" transform="rotate(-90 78 905)" font-family="${SANS}" font-size="19"
+        font-weight="300" letter-spacing="6" fill="#6f615a">MARINE COLLAGEN · ESSENTIAL MINERALS · TARGETED VITAMINS</text>
 
-  <text x="${x + 5}" y="455" font-family="${SANS}" font-size="30" font-weight="300"
-        letter-spacing="8" fill="#e7dcc6">${notes[0]}</text>
-  <text x="${x + 5}" y="500" font-family="${SANS}" font-size="30" font-weight="300"
-        letter-spacing="8" fill="#e7dcc6">${notes[1]}</text>
-  <text x="${x + 5}" y="545" font-family="${SANS}" font-size="30" font-weight="300"
-        letter-spacing="8" fill="#e7dcc6">${notes[2]}</text>
-
-  <text x="${x + 5}" y="770" font-family="${SANS}" font-size="34" font-weight="300"
-        letter-spacing="4" fill="#c9a24b">110 ml</text>
-  <text x="${x + 5}" y="815" font-family="${SANS}" font-size="24" font-weight="300"
-        letter-spacing="6" fill="#8d8678">ALC. 7% VOL.</text>
-
-  <text x="${x + 5}" y="915" font-family="${SANS}" font-size="22" font-weight="300"
-        letter-spacing="14" fill="#8d8678">PREMIUM COCKTAIL</text>
+  <!-- Right/back: brand line (vertical) -->
+  <text x="1300" y="880" transform="rotate(-90 1300 880)" font-family="${SANS}" font-size="26"
+        font-weight="300" letter-spacing="10" fill="#8d7864">WHERE INDULGENCE EVOLVES</text>
+  <text x="1340" y="700" transform="rotate(-90 1340 700)" font-family="${SANS}" font-size="16"
+        font-weight="300" letter-spacing="5" fill="#6f615a">CONSIDERED · INTENTIONAL · PURE</text>
 </svg>`);
-}
-
-async function buildRasmalai() {
-  await sharp(SRC)
-    .extract(LABEL)
-    .png()
-    .toFile(join(LABELS, "rasmalai.png"));
-  console.log("✓ rasmalai.png");
 }
 
 async function buildCanTop() {
@@ -98,42 +82,34 @@ async function buildCanTop() {
   console.log("✓ can-top.png");
 }
 
-async function buildGenerated(slug) {
-  const { name, notes } = GENERATED[slug];
-  const accent = ACCENTS[slug];
-
-  // Gold botanical: crush the dark background to true black so a screen blend
-  // adds only the gold linework (no lightened box around the motif).
+let cachedBotanical = null;
+async function botanicalLayer() {
+  if (cachedBotanical) return cachedBotanical;
   const crushed = await sharp(SRC)
     .extract(BOTANICAL)
     .linear(1.4, -42)
     .resize({ height: 900 })
     .toBuffer();
-  const cMeta = await sharp(crushed).metadata();
-
-  // Feather the left edge to black — erases any stray artwork at the crop edge
-  // and lets the motif dissolve elegantly into the label background.
-  const fade = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${cMeta.width}" height="${cMeta.height}">
+  const m = await sharp(crushed).metadata();
+  const fade = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${m.width}" height="${m.height}">
     <defs><linearGradient id="f" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#000" stop-opacity="1"/>
-      <stop offset="0.10" stop-color="#000" stop-opacity="1"/>
-      <stop offset="0.30" stop-color="#000" stop-opacity="0"/>
+      <stop offset="0.12" stop-color="#000" stop-opacity="1"/>
+      <stop offset="0.32" stop-color="#000" stop-opacity="0"/>
     </linearGradient></defs>
-    <rect width="${cMeta.width}" height="${cMeta.height}" fill="url(#f)"/>
+    <rect width="${m.width}" height="${m.height}" fill="url(#f)"/>
   </svg>`);
-  const botanical = await sharp(crushed)
-    .composite([{ input: fade, blend: "over" }])
-    .toBuffer();
-  const botMeta = await sharp(botanical).metadata();
+  const buf = await sharp(crushed).composite([{ input: fade, blend: "over" }]).toBuffer();
+  cachedBotanical = { buf, meta: await sharp(buf).metadata() };
+  return cachedBotanical;
+}
 
+async function buildLabel(slug) {
+  const { name, notes, accent } = FLAVOURS[slug];
+  const { buf, meta } = await botanicalLayer();
   await sharp({ create: { width: W, height: H, channels: 3, background: BG } })
     .composite([
-      {
-        input: botanical,
-        left: W - botMeta.width - 70,
-        top: Math.round((H - botMeta.height) / 2),
-        blend: "screen",
-      },
+      { input: buf, left: BOT_LEFT, top: Math.round((H - meta.height) / 2), blend: "screen" },
       { input: labelSvg(name, notes, accent), left: 0, top: 0, blend: "over" },
     ])
     .png()
@@ -143,10 +119,8 @@ async function buildGenerated(slug) {
 
 async function main() {
   await mkdir(LABELS, { recursive: true });
-  await buildRasmalai();
   await buildCanTop();
-  await buildGenerated("gulab");
-  await buildGenerated("masala-chai");
+  for (const slug of Object.keys(FLAVOURS)) await buildLabel(slug);
   console.log("\nAll textures written to public/textures/");
 }
 
